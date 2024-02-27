@@ -1,11 +1,14 @@
 from functions import *
 from carte import *
 
+
 def main():
 
     level = map
 
     player_pos = player_init_pos(level)
+
+    o_tile = victory_tile_pos(level)
 
     while True:
         for line in level:
@@ -26,18 +29,16 @@ def main():
         new_player_pos = move_check(level, player_pos, direction, object_move)
 
         if new_player_pos != player_pos:
-            level[player_pos[0]][player_pos[1]] = " "
+            if player_pos in o_tile:
+                level[player_pos[0]][player_pos[1]] = "o"
+            else:
+                level[player_pos[0]][player_pos[1]] = " "
             level[new_player_pos[0]][new_player_pos[1]] = "I"
             player_pos = new_player_pos
 
-        victory_tiles = victory_tile_pos(level)
-        crates_on_tiles = crate_tile_pos(level)
-        if sorted(victory_tiles) == sorted(crates_on_tiles):
-            print("Congratulations! You've won!")
-            break
+
+        
 
 
 if __name__ == "__main__":
     main()
-
-
