@@ -1,63 +1,73 @@
-def player_init_pos(level):
-    player_pos = None
-    for i, line in enumerate(level):
-        for j, section in enumerate(line):
-            if section == "I":
-                player_pos = (i,j)
-        if player_pos:
-            return player_pos
-
-def victory_tile_pos(level):
-    positions_o = []
-    for i, line in enumerate(level):
-        for j, section in enumerate(line):
-            if section == "o":
-                positions_o.append((i,j))
-    return positions_o
-
-def crate_tile_pos(level):
-    positions_c = []
-    for i, line in enumerate(level):
-        for j, section in enumerate(line):
-            if section == "<)":
-                positions_c.append((i,j))
-    return positions_c
+def p_tile_pos(level):  # get player tile position
+    for i, row in enumerate(level):
+        for j, col in enumerate(row):
+            if col == "P":
+                p_pos = (i, j)
+                return p_pos
 
 
-def object_move(direction, player_pos):
+def v_tile_pos(level):  # get victory tile position
+    v_tiles = []
+    for i, row in enumerate(level):
+        for j, col in enumerate(row):
+            if col == "V":
+                v_tiles.append((i, j))
+    return v_tiles
+
+
+def c_tile_pos(level):  # get crate tile pos
+    c_tiles = []
+    for i, row in enumerate(level):
+        for j, col in enumerate(row):
+            if col == "C":
+                c_tiles.append((i, j))
+    return c_tiles
+
+
+def p_next_tile(direction, p_pos, level):
     delta = {"z": (-1, 0), "s": (1, 0), "q": (0, -1), "d": (0, 1)}
-    delta_i, delta_j = delta[direction]
-    new_i = player_pos[0] + delta_i
-    new_j = player_pos[1] + delta_j
-    return new_i, new_j
+    next_p_tile = (p_pos[0] + delta[direction][0], p_pos[1] + delta[direction][1])
 
+    content_at_next_p_tile = level[next_p_tile[0]][next_p_tile[1]]
 
-def move_check(level, player_pos, direction, object_move):
-
-    new_player_pos=object_move(direction, player_pos)
-    current_tile_content=level[player_pos[0]][player_pos[1]]
-    new_tile_content=level[new_player_pos[0]][new_player_pos[1]]
-
-    if new_tile_content == "X":
-        print("There's a wall !")
-        return player_pos
-
-    elif new_tile_content == "<)":
-
-        push_pos = object_move(direction, new_player_pos)
-
-        if level[push_pos[0]][push_pos[1]] == " ":
-            print("You pushed a box !")
-            level[new_player_pos[0]][new_player_pos[1]] = " "
-            level[push_pos[0]][push_pos[1]] = "<)"
-            return new_player_pos
-        elif level[push_pos[0]][push_pos[1]] == "o":
-            print("You pushed a box on a victory point !")
-            level[new_player_pos[0]][new_player_pos[1]] = "o"
-            level[push_pos[0]][push_pos[1]] = "<)"
-            return new_player_pos
+    if content_at_next_p_tile == " ":
+        return 1
+    elif content_at_next_p_tile == "X":
+        return 2
+    elif content_at_next_p_tile == "C":
+        next_c_tile = (next_p_tile[0] + delta[direction][0], next_p_tile[1] + delta[direction][1])
+        content_at_next_c_tile = level[next_c_tile[0]][next_c_tile[1]]
+        if content_at_next_c_tile not in ["X", "C"]:
+            return 3, next_c_tile
         else:
-            print("Can't push the box !")
-            return player_pos
+            return 4
+
+
+def apply_move(level, p_pos, v_tiles, direction):
+    delta = {"z": (-1, 0), "s": (1, 0), "q": (0, -1), "d": (0, 1)}
+    r = p_next_tile(direction, p_pos, level)
+    if isinstance(r, tuple):
+        if r[0] == 3:
+            next_c_tile = r[1]
+            level[next_c_tile[0]][next_c_tile[1]] = "C"
+            next_p_pos = (p_pos[0] + delta[direction][0], p_pos[1] + delta[direction][1])
+            level[next_p_pos[0]][next_p_pos[1]] = "P"
+            level[p_pos[0]][p_pos[1]] = "V" if p_pos in v_tiles else " "
+            p_pos = next_p_pos
+            return p_pos
     else:
-        return new_player_pos
+        if r == 1:
+            next_p_pos = (p_pos[0] + delta[direction][0], p_pos[1] + delta[direction][1])
+            level[next_p_pos[0]][next_p_pos[1]] = "P"
+            level[p_pos[0]][p_pos[1]] = "V" if p_pos in v_tiles else " "
+            p_pos = next_p_pos
+            return p_pos
+
+        elif r == 2:
+            print("there's a wall")
+            return p_pos
+
+        elif r == 4:
+            print("there's something blocking you")
+            return p_pos
+

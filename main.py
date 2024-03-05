@@ -4,40 +4,32 @@ from carte import *
 
 def main():
 
-    level = map
+    p_pos = p_tile_pos(levels)
+    v_tiles = v_tile_pos(levels)
+    c_tiles = c_tile_pos(levels)
 
-    player_pos = player_init_pos(level)
-
-    o_tile = victory_tile_pos(level)
+    print(p_pos, c_tiles)
 
     while True:
-        for line in level:
+        for line in levels:
             print(" ".join(line))
+
+        if c_tiles == v_tiles:
+            print("Congratulations!")
+            break
 
         direction = input("Move (Z=up, S=down, Q=left, D=right), Press X to quit or H to get some help: ")
 
-        if direction not in ["z", "s", "q", "d", "x", "h"]:
+        if direction.lower() not in ["z", "s", "q", "d", "x", "h"]:
             print("Invalid input. Please use z, s, q, d for movement, x to quit and h for help")
-            continue
-        elif direction == "x":
+        elif direction.lower() == "h":
+            print("git gud bro")
+        elif direction.lower() == "x":
             print("Exiting the game, thank you for playing !")
             break
-        elif direction == "h":
-            print("git gud bro")
-            continue
-
-        new_player_pos = move_check(level, player_pos, direction, object_move)
-
-        if new_player_pos != player_pos:
-            if player_pos in o_tile:
-                level[player_pos[0]][player_pos[1]] = "o"
-            else:
-                level[player_pos[0]][player_pos[1]] = " "
-            level[new_player_pos[0]][new_player_pos[1]] = "I"
-            player_pos = new_player_pos
-
-
-        
+        else:
+            p_pos = apply_move(levels, p_pos, v_tiles, direction)
+            c_tiles = c_tile_pos(levels)
 
 
 if __name__ == "__main__":
