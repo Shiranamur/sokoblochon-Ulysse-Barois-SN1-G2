@@ -47,27 +47,23 @@ def apply_move(level, p_pos, v_tiles, direction):
     delta = {"z": (-1, 0), "s": (1, 0), "q": (0, -1), "d": (0, 1)}
     r = p_next_tile(direction, p_pos, level)
     if isinstance(r, tuple):
-        if r[0] == 3:
-            next_c_tile = r[1]
-            level[next_c_tile[0]][next_c_tile[1]] = "C"
-            next_p_pos = (p_pos[0] + delta[direction][0], p_pos[1] + delta[direction][1])
-            level[next_p_pos[0]][next_p_pos[1]] = "P"
-            level[p_pos[0]][p_pos[1]] = "V" if p_pos in v_tiles else " "
-            p_pos = next_p_pos
-            return p_pos
+        next_c_tile = r[1]
+        level[next_c_tile[0]][next_c_tile[1]] = "C"
+        next_p_pos = (p_pos[0] + delta[direction][0], p_pos[1] + delta[direction][1])  # Yikes the first
+        level[next_p_pos[0]][next_p_pos[1]] = "P"
+        level[p_pos[0]][p_pos[1]] = "V" if p_pos in v_tiles else " "
+        p_pos = next_p_pos
+        return p_pos
     else:
         if r == 1:
-            next_p_pos = (p_pos[0] + delta[direction][0], p_pos[1] + delta[direction][1])
+            next_p_pos = (p_pos[0] + delta[direction][0], p_pos[1] + delta[direction][1])  # YIkes junior
             level[next_p_pos[0]][next_p_pos[1]] = "P"
             level[p_pos[0]][p_pos[1]] = "V" if p_pos in v_tiles else " "
             p_pos = next_p_pos
             return p_pos
-
         elif r == 2:
             print("there's a wall")
             return p_pos
-
         elif r == 4:
             print("there's something blocking you")
             return p_pos
-
