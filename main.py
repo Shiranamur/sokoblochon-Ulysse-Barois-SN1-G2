@@ -23,7 +23,7 @@ def main():
                         print("Invalid input. Use Z, S, Q, D to move, R to retry, X to quit, and H for help.")
                         continue
                     elif direction == "h":
-                        print("Help: Use Z, S, Q, D to move, R to retry, and X to quit.")
+                        print("player is P, crates are C, victory points are V, Walls are X.")
                         continue
                     elif direction == "x":
                         print("Exiting the game, thank you for playing!")
